@@ -1,0 +1,2167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Counter Pro - 3D Counting App</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Custom Properties */
+        :root {
+            --primary-blue: #3b82f6;
+            --primary-green: #10b981;
+            --primary-purple: #8b5cf6;
+            --primary-orange: #f97316;
+            --destructive-red: #ef4444;
+            --background-dark: #0f172a;
+            --card-background: rgba(30, 41, 59, 0.5);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --shadow-color: rgba(0, 0, 0, 0.3);
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(90deg, rgba(30, 41, 59, 0.5) 0%, rgba(15, 23, 42, 0.5) 100%);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .app-icon {
+            width: 3rem;
+            height: 3rem;
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-purple));
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: float 3s ease-in-out infinite;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .app-icon svg {
+            color: white;
+        }
+
+        .header-text h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, #ffffff, #bfdbfe);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-text p {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        /* Three Column Layout */
+        .three-column-layout {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        @media (min-width: 1024px) {
+            .three-column-layout {
+                grid-template-columns: 15% 70% 15%;
+                gap: 1rem;
+            }
+        }
+
+        @media (min-width: 768px) and (max-width: 1023px) {
+            .three-column-layout {
+                grid-template-columns: 1fr 2fr 1fr;
+                gap: 1rem;
+            }
+        }
+
+        /* Card Base Styles */
+        .card {
+            background: var(--card-background);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--border-color);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            transform: perspective(1000px) rotateX(2deg);
+            transition: all 0.3s ease;
+            box-shadow: 
+                0 10px 25px -5px var(--shadow-color),
+                0 4px 6px -2px rgba(0, 0, 0, 0.05),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .card:hover {
+            transform: perspective(1000px) rotateX(0deg) translateY(-5px);
+            box-shadow: 
+                0 20px 40px -10px var(--shadow-color),
+                0 8px 15px -5px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.15);
+        }
+
+        /* Card Headers */
+        .card-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .icon-container {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 0.75rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 0.75rem;
+            background: rgba(59, 130, 246, 0.2);
+            box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
+        }
+
+        .icon-container.green {
+            background: rgba(16, 185, 129, 0.2);
+            box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
+        }
+
+        .icon-container.purple {
+            background: rgba(139, 92, 246, 0.2);
+            box-shadow: 0 4px 10px rgba(139, 92, 246, 0.3);
+        }
+
+        .icon-container.orange {
+            background: rgba(249, 115, 22, 0.2);
+            box-shadow: 0 4px 10px rgba(249, 115, 22, 0.3);
+        }
+
+        .card-header h2 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            color: var(--primary-blue);
+        }
+
+        .batch-card .card-header h2 {
+            color: var(--primary-green);
+        }
+
+        .batches-card .card-header h2 {
+            color: var(--primary-purple);
+        }
+
+        .card-header p {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        /* LED Display Styles */
+        .led-display {
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3);
+            margin-bottom: 1.5rem;
+        }
+
+        .led-display.large {
+            padding: 2rem;
+        }
+
+        .led-digits {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.25rem;
+            flex-wrap: wrap;
+        }
+
+        .main-digits {
+            gap: 0.5rem;
+        }
+
+        .digit-group {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .led-digit {
+            width: 3rem;
+            height: 4rem;
+            background: linear-gradient(145deg, #1e293b, #0f172a);
+            border: 2px solid rgba(59, 130, 246, 0.3);
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Courier New', monospace;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-blue);
+            text-shadow: 0 0 10px currentColor;
+            box-shadow: 
+                0 4px 8px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .led-digit.main {
+            width: 4rem;
+            height: 6rem;
+            font-size: 2.5rem;
+        }
+
+        .led-digit.purple {
+            color: var(--primary-purple);
+            border-color: rgba(139, 92, 246, 0.3);
+            text-shadow: 0 0 10px var(--primary-purple);
+        }
+
+        .led-digit.active {
+            border-color: var(--primary-green);
+            box-shadow: 
+                0 0 20px rgba(16, 185, 129, 0.5),
+                0 4px 8px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            animation: pulse 1s ease-in-out infinite;
+        }
+
+        .separator {
+            color: rgba(59, 130, 246, 0.5);
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 0 0.25rem;
+        }
+
+        .batch-progress {
+            text-align: center;
+            margin-top: 1rem;
+            padding: 0.5rem 1rem;
+            background: rgba(59, 130, 246, 0.2);
+            border-radius: 1rem;
+            display: inline-block;
+        }
+
+        .batch-progress span {
+            color: var(--primary-blue);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .led-display p {
+            text-align: center;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+        }
+
+        /* Button Styles */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transform-style: preserve-3d;
+            box-shadow: 
+                0 4px 6px -1px rgba(0, 0, 0, 0.1),
+                0 2px 4px -1px rgba(0, 0, 0, 0.06),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(1px) scale(0.98);
+            box-shadow: 
+                inset 0 2px 4px rgba(0, 0, 0, 0.2),
+                inset 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-green), #059669);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #64748b, #475569);
+            color: white;
+        }
+
+        .btn-destructive {
+            background: linear-gradient(135deg, var(--destructive-red), #dc2626);
+            color: white;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .btn-orange {
+            background: linear-gradient(135deg, var(--primary-orange), #ea580c);
+            color: white;
+        }
+
+        .btn-small {
+            padding: 0.5rem;
+            width: 2rem;
+            height: 2rem;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+        }
+
+        /* Counter Button */
+        .counter-button {
+            position: relative;
+            width: 10rem;
+            height: 10rem;
+            border-radius: 50%;
+            border: 4px solid rgba(255, 255, 255, 0.2);
+            background: linear-gradient(135deg, var(--primary-green), #059669);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            transform-style: preserve-3d;
+            box-shadow: 
+                0 8px 16px rgba(0, 0, 0, 0.2),
+                0 4px 8px rgba(0, 0, 0, 0.1),
+                inset 0 2px 0 rgba(255, 255, 255, 0.2),
+                inset 0 -2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .counter-button:hover {
+            transform: translateY(-4px);
+            box-shadow: 
+                0 12px 24px rgba(0, 0, 0, 0.25),
+                0 6px 12px rgba(0, 0, 0, 0.15),
+                inset 0 2px 0 rgba(255, 255, 255, 0.2),
+                inset 0 -2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .counter-button:active {
+            transform: translateY(2px) scale(0.95);
+            box-shadow: 
+                0 4px 8px rgba(0, 0, 0, 0.15),
+                0 2px 4px rgba(0, 0, 0, 0.1),
+                inset 0 2px 8px rgba(0, 0, 0, 0.2),
+                inset 0 -1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .button-shine {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 4rem;
+            height: 4rem;
+            background: linear-gradient(45deg, rgba(255, 255, 255, 0.2), transparent);
+            border-radius: 50%;
+        }
+
+        .button-indicator {
+            position: absolute;
+            top: -0.5rem;
+            right: -0.5rem;
+            width: 1rem;
+            height: 1rem;
+            background: #fbbf24;
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .counter-button svg {
+            color: white;
+            position: relative;
+            z-index: 10;
+            transition: transform 0.1s ease;
+        }
+
+        .counter-button:active svg {
+            transform: scale(0.9);
+        }
+
+        /* Control Grids */
+        .batch-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 0.5rem;
+        }
+
+        .counter-actions {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        /* Features Section */
+        .features-section {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        @media (min-width: 1024px) {
+            .features-section {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (min-width: 768px) and (max-width: 1023px) {
+            .features-section {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Feature Toggles */
+        .feature-toggles {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem;
+            background: rgba(15, 23, 42, 0.3);
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+            transition: background 0.2s ease;
+        }
+
+        .feature-item:hover {
+            background: rgba(15, 23, 42, 0.5);
+        }
+
+        .feature-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .feature-icon {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(16, 185, 129, 0.2);
+        }
+
+        .feature-icon.blue {
+            background: rgba(59, 130, 246, 0.2);
+        }
+
+        .feature-icon.purple {
+            background: rgba(139, 92, 246, 0.2);
+        }
+
+        .feature-icon.green {
+            background: rgba(16, 185, 129, 0.2);
+        }
+
+        .feature-icon.gray {
+            background: rgba(100, 116, 139, 0.2);
+        }
+
+        .feature-icon.orange {
+            background: rgba(249, 115, 22, 0.2);
+        }
+
+        .feature-info p {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .feature-info small {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        /* Toggle Switch */
+        .toggle {
+            position: relative;
+            display: inline-block;
+            width: 3rem;
+            height: 1.5rem;
+        }
+
+        .toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #64748b;
+            transition: 0.3s;
+            border-radius: 1.5rem;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 1rem;
+            width: 1rem;
+            left: 0.25rem;
+            bottom: 0.25rem;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        input:checked + .slider {
+            background-color: var(--primary-green);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(1.5rem);
+        }
+
+        /* Records List */
+        .records-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .record-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem;
+            background: rgba(15, 23, 42, 0.3);
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+            transition: all 0.2s ease;
+        }
+
+        .record-item:hover {
+            background: rgba(15, 23, 42, 0.5);
+            transform: translateY(-1px);
+        }
+
+        .record-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .record-icon {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(59, 130, 246, 0.2);
+        }
+
+        .record-count {
+            text-align: right;
+        }
+
+        .record-count span {
+            font-size: 1.125rem;
+            font-weight: bold;
+            color: var(--primary-blue);
+        }
+
+        .record-count small {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            display: block;
+        }
+
+        .summary-stats {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem;
+            background: linear-gradient(90deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
+            border-radius: 0.5rem;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .stat {
+            text-align: center;
+            flex: 1;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            display: block;
+        }
+
+        .stat-number.blue {
+            color: var(--primary-blue);
+        }
+
+        .stat-number.purple {
+            color: var(--primary-purple);
+        }
+
+        .stat small {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        /* Mantra List */
+        .mantra-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .mantra-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem;
+            background: rgba(15, 23, 42, 0.3);
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .mantra-item:hover {
+            background: rgba(15, 23, 42, 0.5);
+            transform: translateY(-1px);
+        }
+
+        .mantra-item.active {
+            border-color: rgba(249, 115, 22, 0.4);
+            background: rgba(249, 115, 22, 0.1);
+        }
+
+        .mantra-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .mantra-icon {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(100, 116, 139, 0.2);
+        }
+
+        .mantra-icon.orange {
+            background: rgba(249, 115, 22, 0.2);
+        }
+
+        .mantra-count {
+            text-align: right;
+        }
+
+        .mantra-count span {
+            font-size: 0.875rem;
+            font-weight: bold;
+            color: var(--text-secondary);
+        }
+
+        .mantra-item.active .mantra-count span {
+            color: var(--primary-orange);
+        }
+
+        .mantra-count small {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            display: block;
+        }
+
+        /* Delete Button Styles */
+        .delete-mantra-btn {
+            background: transparent;
+            border: none;
+            color: var(--destructive-red);
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            transition: all 0.2s ease;
+            opacity: 0.7;
+            margin-left: 0.5rem;
+        }
+
+        .delete-mantra-btn:hover {
+            opacity: 1;
+            background: rgba(239, 68, 68, 0.1);
+            transform: scale(1.1);
+        }
+
+        .delete-mantra-btn:active {
+            transform: scale(0.95);
+        }
+
+        .mantra-item:hover .delete-mantra-btn {
+            opacity: 1;
+        }
+
+        /* Sound Settings Styles */
+        select {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--border-color);
+            border-radius: 0.375rem;
+            color: var(--text-primary);
+            padding: 0.375rem 0.75rem;
+            font-size: 0.875rem;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        select option {
+            background: var(--background-dark);
+            color: var(--text-primary);
+        }
+
+        /* Footer */
+        .footer {
+            background: linear-gradient(90deg, rgba(30, 41, 59, 0.3) 0%, rgba(15, 23, 42, 0.3) 100%);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid var(--border-color);
+            padding: 1.5rem 1rem;
+            margin-top: 3rem;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .footer-content {
+                flex-direction: row;
+                justify-content: space-between;
+            }
+        }
+
+        .footer-indicators {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .dot {
+            width: 0.5rem;
+            height: 0.5rem;
+            border-radius: 50%;
+        }
+
+        .dot.green {
+            background: var(--primary-green);
+        }
+
+        .dot.blue {
+            background: var(--primary-blue);
+        }
+
+        .dot.purple {
+            background: var(--primary-purple);
+        }
+
+        .footer-text p {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: var(--card-background);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--border-color);
+            border-radius: 1rem;
+            padding: 0;
+            width: 90%;
+            max-width: 425px;
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 1.5rem 0;
+        }
+
+        .modal-header h3 {
+            color: var(--text-primary);
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0;
+            width: 2rem;
+            height: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            color: var(--text-primary);
+        }
+
+        .modal-body {
+            padding: 1rem 1.5rem;
+        }
+
+        .modal-footer {
+            padding: 0 1.5rem 1.5rem;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-group input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        /* Animations */
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        @keyframes flip {
+            0% { transform: rotateY(0); }
+            50% { transform: rotateY(180deg); }
+            100% { transform: rotateY(0); }
+        }
+
+        .animate-flip {
+            animation: flip 0.6s ease-in-out;
+        }
+
+        /* Mobile Optimizations */
+        @media (max-width: 640px) {
+            .main-content {
+                padding: 0 0.5rem;
+            }
+            
+            .card {
+                padding: 1rem;
+            }
+            
+            .led-digit {
+                width: 2.5rem;
+                height: 3rem;
+                font-size: 1.25rem;
+            }
+            
+            .led-digit.main {
+                width: 3rem;
+                height: 4.5rem;
+                font-size: 2rem;
+            }
+            
+            .counter-button {
+                width: 8rem;
+                height: 8rem;
+            }
+            
+            .counter-button svg {
+                width: 36px;
+                height: 36px;
+            }
+            
+            .header-text h1 {
+                font-size: 1.25rem;
+            }
+            
+            .header-text p {
+                font-size: 0.75rem;
+            }
+            
+            .three-column-layout {
+                gap: 1rem;
+            }
+            
+            .features-section {
+                gap: 1rem;
+            }
+            
+            .footer-indicators {
+                gap: 1rem;
+            }
+        }
+
+        /* Touch Targets */
+        @media (pointer: coarse) {
+            .btn {
+                min-height: 44px;
+                min-width: 44px;
+            }
+            
+            .counter-button {
+                min-width: 120px;
+                min-height: 120px;
+            }
+            
+            .toggle {
+                min-height: 44px;
+                min-width: 44px;
+            }
+
+            .delete-mantra-btn {
+                min-height: 44px;
+                min-width: 44px;
+                padding: 0.75rem;
+            }
+
+            select {
+                min-height: 44px;
+                padding: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="app-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18.178 8.5c0 0-1.618-1.618-4.178-1.618s-4.178 1.618-4.178 1.618-1.618 1.618-1.618 4.178 1.618 4.178 1.618 4.178 1.618 1.618 4.178 1.618 4.178-1.618 4.178-1.618 1.618-1.618 1.618-4.178-1.618-4.178-1.618-4.178z"/>
+                </svg>
+            </div>
+            <div class="header-text">
+                <h1>Counter Pro</h1>
+                <p>Advanced Spiritual Counting Companion</p>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Three Column Layout -->
+        <div class="three-column-layout">
+            <!-- Batch Size Setting -->
+            <div class="column batch-setting">
+                <div class="card batch-card">
+                    <div class="card-header">
+                        <div class="icon-container green">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="3"/>
+                                <path d="m12 1 3 6-3 1-3-1 3-6z"/>
+                                <path d="m12 23-3-6 3-1 3 1-3 6z"/>
+                                <path d="m20 12-6-3 1-3 1 3 6 3z"/>
+                                <path d="m4 12 6-3-1-3-1 3-6 3z"/>
+                            </svg>
+                        </div>
+                        <h2>Batch Size Setting</h2>
+                        <p>Count per batch (Max: 999)</p>
+                    </div>
+                    
+                    <div class="batch-display">
+                        <div class="led-display">
+                            <div class="led-digits">
+                                <div class="led-digit" id="digit-0">1</div>
+                                <div class="led-digit" id="digit-1">0</div>
+                                <div class="led-digit" id="digit-2">8</div>
+                            </div>
+                            <p>Current batch size</p>
+                        </div>
+                    </div>
+                    
+                    <div class="batch-controls">
+                        <button class="btn btn-secondary" id="digit-minus">−</button>
+                        <button class="btn btn-primary" id="digit-ok">OK</button>
+                        <button class="btn btn-secondary" id="digit-plus">+</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Counter -->
+            <div class="column main-counter">
+                <div class="card counter-card">
+                    <div class="card-header">
+                        <div class="icon-container blue">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M18 8h1a4 4 0 0 1 0 8h-1"/>
+                                <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/>
+                                <line x1="6" y1="1" x2="6" y2="4"/>
+                                <line x1="10" y1="1" x2="10" y2="4"/>
+                                <line x1="14" y1="1" x2="14" y2="4"/>
+                            </svg>
+                        </div>
+                        <h2>Main Counter</h2>
+                        <p>Current Count (Max: 999,999,999)</p>
+                    </div>
+                    
+                    <div class="counter-display">
+                        <div class="led-display large">
+                            <div class="led-digits main-digits">
+                                <div class="digit-group">
+                                    <div class="led-digit main" id="main-digit-0">0</div>
+                                    <div class="led-digit main" id="main-digit-1">0</div>
+                                    <div class="led-digit main" id="main-digit-2">0</div>
+                                </div>
+                                <div class="separator">.</div>
+                                <div class="digit-group">
+                                    <div class="led-digit main" id="main-digit-3">0</div>
+                                    <div class="led-digit main" id="main-digit-4">0</div>
+                                    <div class="led-digit main" id="main-digit-5">0</div>
+                                </div>
+                                <div class="separator">.</div>
+                                <div class="digit-group">
+                                    <div class="led-digit main" id="main-digit-6">0</div>
+                                    <div class="led-digit main" id="main-digit-7">0</div>
+                                    <div class="led-digit main" id="main-digit-8">0</div>
+                                </div>
+                            </div>
+                            <div class="batch-progress">
+                                <span>Batch Progress: <span id="batch-progress">0</span>/<span id="batch-size-display">108</span></span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="counter-actions">
+                        <button class="counter-button" id="increment-btn">
+                            <div class="button-shine"></div>
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <line x1="12" y1="5" x2="12" y2="19"/>
+                                <line x1="5" y1="12" x2="19" y2="12"/>
+                            </svg>
+                            <div class="button-indicator"></div>
+                        </button>
+                        
+                        <button class="btn btn-destructive" id="reset-btn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                                <path d="M3 3v5h5"/>
+                            </svg>
+                            Reset Count
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Completed Batches -->
+            <div class="column completed-batches">
+                <div class="card batches-card">
+                    <div class="card-header">
+                        <div class="icon-container purple">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                <polyline points="22,4 12,14.01 9,11.01"/>
+                            </svg>
+                        </div>
+                        <h2>Completed Batches</h2>
+                        <p>Batches completed today</p>
+                    </div>
+                    
+                    <div class="batch-display">
+                        <div class="led-display">
+                            <div class="led-digits">
+                                <div class="led-digit purple" id="batch-digit-0">0</div>
+                                <div class="led-digit purple" id="batch-digit-1">0</div>
+                                <div class="led-digit purple" id="batch-digit-2">0</div>
+                            </div>
+                            <p>Batches completed</p>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-outline" id="reset-batches-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                            <path d="M3 3v5h5"/>
+                        </svg>
+                        Reset Batches
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scrollable Features Section -->
+        <div class="features-section">
+            <!-- App Features -->
+            <div class="card features-card">
+                <div class="card-header">
+                    <div class="icon-container">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="4" y1="21" x2="4" y2="14"/>
+                            <line x1="4" y1="10" x2="4" y2="3"/>
+                            <line x1="12" y1="21" x2="12" y2="12"/>
+                            <line x1="12" y1="8" x2="12" y2="3"/>
+                            <line x1="20" y1="21" x2="20" y2="16"/>
+                            <line x1="20" y1="12" x2="20" y2="3"/>
+                            <line x1="1" y1="14" x2="7" y2="14"/>
+                            <line x1="9" y1="8" x2="15" y2="8"/>
+                            <line x1="17" y1="16" x2="23" y2="16"/>
+                        </svg>
+                    </div>
+                    <h3>App Features</h3>
+                </div>
+                
+                <!-- Sound Settings Card -->
+                <div class="sound-settings-card" style="margin-bottom: 1.5rem; padding: 1rem; background: rgba(15, 23, 42, 0.3); border-radius: 0.75rem; border: 1px solid var(--border-color);">
+                    <h4 style="color: var(--primary-orange); margin-bottom: 1rem; font-size: 0.875rem; font-weight: 600;">Sound Settings</h4>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                        <div style="display: flex; align-items: center; justify-content: space-between;">
+                            <label for="sound-type-select" style="color: var(--text-primary); font-size: 0.875rem;">Sound Type:</label>
+                            <select id="sound-type-select" style="background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-color); border-radius: 0.375rem; color: var(--text-primary); padding: 0.375rem 0.75rem; font-size: 0.875rem;">
+                                <option value="beep">Simple Beep</option>
+                                <option value="chime">Gentle Chime</option>
+                                <option value="bell">Temple Bell</option>
+                                <option value="zen">Zen Bowl</option>
+                                <option value="custom" style="display: none;">Custom Sound</option>
+                            </select>
+                        </div>
+                        
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="btn btn-outline" id="upload-sound-btn" style="flex: 1; font-size: 0.75rem; padding: 0.5rem;">Upload Custom</button>
+                            <button class="btn btn-orange" id="test-sound-btn" style="flex: 1; font-size: 0.75rem; padding: 0.5rem;">Test Sound</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="feature-toggles">
+                    <div class="feature-item">
+                        <div class="feature-info">
+                            <div class="feature-icon green">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M18 8h1a4 4 0 0 1 0 8h-1"/>
+                                    <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/>
+                                    <line x1="6" y1="1" x2="6" y2="4"/>
+                                    <line x1="10" y1="1" x2="10" y2="4"/>
+                                    <line x1="14" y1="1" x2="14" y2="4"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <p>Offline Mode</p>
+                                <small>Works without internet</small>
+                            </div>
+                        </div>
+                        <label class="toggle">
+                            <input type="checkbox" id="offline-toggle" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-info">
+                            <div class="feature-icon blue">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
+                                    <line x1="12" y1="18" x2="12.01" y2="18"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <p>Screen-Off Counting</p>
+                                <small>Tap anywhere to count</small>
+                            </div>
+                        </div>
+                        <label class="toggle">
+                            <input type="checkbox" id="screen-off-toggle" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-info">
+                            <div class="feature-icon purple">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                                    <polyline points="17,21 17,13 7,13 7,21"/>
+                                    <polyline points="7,3 7,8 15,8"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <p>Auto-Save</p>
+                                <small>Data saved locally</small>
+                            </div>
+                        </div>
+                        <label class="toggle">
+                            <input type="checkbox" id="auto-save-toggle" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-info">
+                            <div class="feature-icon orange">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polygon points="11 5,6 9,2 9,2 15,6 15,11 19,11 5"/>
+                                    <path d="m19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <p>Batch Complete Sound</p>
+                                <small>Audio notification</small>
+                            </div>
+                        </div>
+                        <label class="toggle">
+                            <input type="checkbox" id="sound-toggle" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Daily Records -->
+            <div class="card records-card">
+                <div class="card-header">
+                    <div class="icon-container blue">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/>
+                        </svg>
+                    </div>
+                    <h3>Daily Records</h3>
+                </div>
+                
+                <div class="records-list">
+                    <div class="record-item">
+                        <div class="record-info">
+                            <div class="record-icon blue">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                                    <line x1="16" y1="2" x2="16" y2="6"/>
+                                    <line x1="8" y1="2" x2="8" y2="6"/>
+                                    <line x1="3" y1="10" x2="21" y2="10"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <p>Today</p>
+                                <small>108 per batch</small>
+                            </div>
+                        </div>
+                        <div class="record-count">
+                            <span id="today-batches">0</span>
+                            <small>batches</small>
+                        </div>
+                    </div>
+                    
+                    <div class="record-item">
+                        <div class="record-info">
+                            <div class="record-icon gray">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                                    <line x1="16" y1="2" x2="16" y2="6"/>
+                                    <line x1="8" y1="2" x2="8" y2="6"/>
+                                    <line x1="3" y1="10" x2="21" y2="10"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <p>Yesterday</p>
+                                <small>108 per batch</small>
+                            </div>
+                        </div>
+                        <div class="record-count">
+                            <span id="yesterday-batches">0</span>
+                            <small>batches</small>
+                        </div>
+                    </div>
+                    
+                    <div class="summary-stats">
+                        <div class="stat">
+                            <span class="stat-number blue" id="week-total">0</span>
+                            <small>This Week</small>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-number purple" id="month-total">0</span>
+                            <small>This Month</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mantra List -->
+            <div class="card mantra-card">
+                <div class="card-header">
+                    <div class="icon-container orange">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                        </svg>
+                    </div>
+                    <h3>Mantra List</h3>
+                    <button class="btn btn-small btn-orange" id="add-mantra-btn">+</button>
+                </div>
+                
+                <div class="mantra-list" id="mantra-list">
+                    <!-- Mantras will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-indicators">
+                <div class="indicator">
+                    <span class="dot green"></span>
+                    <span>Data stored locally</span>
+                </div>
+                <div class="indicator">
+                    <span class="dot blue"></span>
+                    <span>Privacy focused</span>
+                </div>
+                <div class="indicator">
+                    <span class="dot purple"></span>
+                    <span>Works offline</span>
+                </div>
+            </div>
+            <div class="footer-text">
+                <p>© 2024 Counter Pro - Spiritual Counting Companion</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Add Mantra Modal -->
+    <div class="modal" id="add-mantra-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add New Mantra</h3>
+                <button class="modal-close" id="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="mantra-name">Mantra Name</label>
+                    <input type="text" id="mantra-name" placeholder="Enter mantra name">
+                </div>
+                <div class="form-group">
+                    <label for="mantra-batch-size">Batch Size</label>
+                    <input type="number" id="mantra-batch-size" value="108" min="1" max="999">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-orange" id="save-mantra-btn">Add Mantra</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Save to Mantra Modal -->
+    <div class="modal" id="save-to-mantra-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Save Progress to Mantra</h3>
+                <button class="modal-close" id="save-modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.875rem;">
+                    Save your completed batches to update your mantra progress before resetting.
+                </p>
+                <div class="form-group">
+                    <label for="save-mantra-name">Mantra Name</label>
+                    <input type="text" id="save-mantra-name" placeholder="Enter mantra name">
+                </div>
+                <div class="form-group">
+                    <label for="save-mantra-batch-size">Batch Size</label>
+                    <input type="number" id="save-mantra-batch-size" value="108" min="1" max="999">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="window.counterApp.hideSaveToMantraModal(); window.counterApp.resetBatches();" style="margin-right: 1rem;">Skip & Reset</button>
+                <button class="btn btn-orange" id="save-to-mantra-btn">Save & Reset</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Counter Pro - 3D Counting App JavaScript
+        class CounterApp {
+            constructor() {
+                this.state = {
+                    currentCount: 0,
+                    batchSize: 108,
+                    completedBatches: 0,
+                    currentDigitIndex: 0,
+                    screenOffCounting: false,
+                    settings: {
+                        offlineMode: true,
+                        screenOffCounting: true,
+                        autoSave: true,
+                        soundEnabled: true,
+                        soundType: 'beep'
+                    },
+                    mantras: [
+                        { id: 1, name: 'Gayatri Mantra', batchSize: 108, totalBatches: 15, isActive: true },
+                        { id: 2, name: 'Maha Mantra', batchSize: 108, totalBatches: 23, isActive: false },
+                        { id: 3, name: 'Om Namah Shivaya', batchSize: 54, totalBatches: 8, isActive: false }
+                    ],
+                    dailyRecords: {
+                        today: 0,
+                        yesterday: 0,
+                        weekTotal: 0,
+                        monthTotal: 0
+                    },
+                    customSound: null
+                };
+
+                this.init();
+            }
+
+            init() {
+                this.loadFromStorage();
+                this.bindEvents();
+                this.updateDisplay();
+                this.setupScreenOffCounting();
+                this.startAutoSave();
+            }
+
+            // Local Storage Management
+            loadFromStorage() {
+                const saved = localStorage.getItem('counterPro');
+                if (saved) {
+                    try {
+                        const data = JSON.parse(saved);
+                        this.state = { ...this.state, ...data };
+                    } catch (e) {
+                        console.warn('Failed to load saved data');
+                    }
+                }
+            }
+
+            saveToStorage() {
+                try {
+                    localStorage.setItem('counterPro', JSON.stringify(this.state));
+                } catch (e) {
+                    console.warn('Failed to save data');
+                }
+            }
+
+            // Event Binding
+            bindEvents() {
+                // Main counter actions
+                document.getElementById('increment-btn').addEventListener('click', () => this.incrementCounter());
+                document.getElementById('reset-btn').addEventListener('click', () => this.resetCounter());
+                
+                // Batch size controls
+                document.getElementById('digit-minus').addEventListener('click', () => this.adjustDigit(false));
+                document.getElementById('digit-plus').addEventListener('click', () => this.adjustDigit(true));
+                document.getElementById('digit-ok').addEventListener('click', () => this.confirmDigit());
+                
+                // Batch reset
+                document.getElementById('reset-batches-btn').addEventListener('click', () => this.resetBatches());
+                
+                // Settings toggles
+                document.getElementById('offline-toggle').addEventListener('change', (e) => {
+                    this.state.settings.offlineMode = e.target.checked;
+                    this.saveToStorage();
+                });
+                
+                document.getElementById('screen-off-toggle').addEventListener('change', (e) => {
+                    this.state.settings.screenOffCounting = e.target.checked;
+                    this.setupScreenOffCounting();
+                    this.saveToStorage();
+                });
+                
+                document.getElementById('auto-save-toggle').addEventListener('change', (e) => {
+                    this.state.settings.autoSave = e.target.checked;
+                    this.saveToStorage();
+                });
+                
+                document.getElementById('sound-toggle').addEventListener('change', (e) => {
+                    this.state.settings.soundEnabled = e.target.checked;
+                    this.saveToStorage();
+                });
+                
+                document.getElementById('sound-type-select').addEventListener('change', (e) => {
+                    this.state.settings.soundType = e.target.value;
+                    this.saveToStorage();
+                });
+                
+                document.getElementById('upload-sound-btn').addEventListener('click', () => this.uploadCustomSound());
+                document.getElementById('test-sound-btn').addEventListener('click', () => this.playBatchCompleteSound());
+
+                // Modal controls
+                document.getElementById('add-mantra-btn').addEventListener('click', () => this.showAddMantraModal());
+                document.getElementById('modal-close').addEventListener('click', () => this.hideAddMantraModal());
+                document.getElementById('save-mantra-btn').addEventListener('click', () => this.addMantra());
+                
+                // Save to mantra modal controls
+                document.getElementById('save-modal-close').addEventListener('click', () => this.hideSaveToMantraModal());
+                document.getElementById('save-to-mantra-btn').addEventListener('click', () => this.saveToMantra());
+
+                // Click outside modal to close
+                document.getElementById('add-mantra-modal').addEventListener('click', (e) => {
+                    if (e.target.id === 'add-mantra-modal') {
+                        this.hideAddMantraModal();
+                    }
+                });
+
+                document.getElementById('save-to-mantra-modal').addEventListener('click', (e) => {
+                    if (e.target.id === 'save-to-mantra-modal') {
+                        this.hideSaveToMantraModal();
+                    }
+                });
+
+                // Keyboard shortcuts
+                document.addEventListener('keydown', (e) => {
+                    if (e.code === 'Space') {
+                        e.preventDefault();
+                        this.incrementCounter();
+                    } else if (e.code === 'KeyR' && e.ctrlKey) {
+                        e.preventDefault();
+                        this.resetCounter();
+                    }
+                });
+            }
+
+            // Counter Logic
+            incrementCounter() {
+                this.state.currentCount++;
+                
+                // Calculate completed batches
+                const newCompletedBatches = Math.floor(this.state.currentCount / this.state.batchSize);
+                
+                // Check if we completed a new batch
+                if (newCompletedBatches > this.state.completedBatches) {
+                    this.state.completedBatches = newCompletedBatches;
+                    this.playBatchCompleteSound();
+                    this.updateDailyRecord();
+                }
+
+                this.updateDisplay();
+                this.saveToStorage();
+                
+                // Haptic feedback on mobile
+                if (navigator.vibrate) {
+                    navigator.vibrate(50);
+                }
+            }
+
+            resetCounter() {
+                if (confirm('Are you sure you want to reset the counter?')) {
+                    this.state.currentCount = 0;
+                    this.updateDisplay();
+                    this.saveToStorage();
+                }
+            }
+
+            resetBatches() {
+                if (this.state.completedBatches > 0) {
+                    const shouldSave = confirm('You have completed ' + this.state.completedBatches + ' batches. Would you like to save this progress to your mantra list before resetting?');
+                    
+                    if (shouldSave) {
+                        this.showSaveToMantraModal();
+                        return;
+                    }
+                }
+                
+                if (confirm('Are you sure you want to reset completed batches?')) {
+                    this.state.completedBatches = 0;
+                    this.state.dailyRecords.today = 0;
+                    this.updateDisplay();
+                    this.saveToStorage();
+                }
+            }
+
+            // Batch Size Controls
+            adjustDigit(increment) {
+                const digits = this.state.batchSize.toString().padStart(3, '0').split('').map(Number);
+                
+                if (increment) {
+                    digits[this.state.currentDigitIndex] = (digits[this.state.currentDigitIndex] + 1) % 10;
+                } else {
+                    digits[this.state.currentDigitIndex] = digits[this.state.currentDigitIndex] === 0 ? 9 : digits[this.state.currentDigitIndex] - 1;
+                }
+                
+                const newSize = parseInt(digits.join(''));
+                this.state.batchSize = Math.max(1, Math.min(999, newSize));
+                
+                this.updateDisplay();
+                this.saveToStorage();
+            }
+
+            confirmDigit() {
+                this.state.currentDigitIndex = (this.state.currentDigitIndex + 1) % 3;
+                this.updateDisplay();
+            }
+
+            // Display Updates
+            updateDisplay() {
+                this.updateMainCounter();
+                this.updateBatchSize();
+                this.updateCompletedBatches();
+                this.updateDailyRecords();
+                this.updateMantras();
+                this.updateBatchProgress();
+                this.updateSoundSettings();
+            }
+
+            updateMainCounter() {
+                const countStr = this.state.currentCount.toString().padStart(9, '0');
+                for (let i = 0; i < 9; i++) {
+                    const element = document.getElementById(`main-digit-${i}`);
+                    if (element) {
+                        const newValue = countStr[i];
+                        const currentValue = element.textContent;
+                        
+                        // Only update and animate if the value actually changed
+                        if (newValue !== currentValue) {
+                            element.textContent = newValue;
+                            
+                            // Add animation for changed digits
+                            element.classList.remove('animate-flip');
+                            setTimeout(() => element.classList.add('animate-flip'), 10);
+                        }
+                    }
+                }
+            }
+
+            updateBatchSize() {
+                const batchStr = this.state.batchSize.toString().padStart(3, '0');
+                for (let i = 0; i < 3; i++) {
+                    const element = document.getElementById(`digit-${i}`);
+                    if (element) {
+                        element.textContent = batchStr[i];
+                        
+                        // Highlight current digit
+                        element.classList.toggle('active', i === this.state.currentDigitIndex);
+                    }
+                }
+                
+                // Update batch size display in main counter
+                const batchSizeDisplay = document.getElementById('batch-size-display');
+                if (batchSizeDisplay) {
+                    batchSizeDisplay.textContent = this.state.batchSize;
+                }
+            }
+
+            updateCompletedBatches() {
+                const batchesStr = this.state.completedBatches.toString().padStart(3, '0');
+                for (let i = 0; i < 3; i++) {
+                    const element = document.getElementById(`batch-digit-${i}`);
+                    if (element) {
+                        element.textContent = batchesStr[i];
+                    }
+                }
+            }
+
+            updateBatchProgress() {
+                const progress = this.state.currentCount % this.state.batchSize;
+                const progressElement = document.getElementById('batch-progress');
+                if (progressElement) {
+                    progressElement.textContent = progress;
+                }
+            }
+
+            updateDailyRecords() {
+                document.getElementById('today-batches').textContent = this.state.dailyRecords.today;
+                document.getElementById('yesterday-batches').textContent = this.state.dailyRecords.yesterday;
+                document.getElementById('week-total').textContent = this.state.dailyRecords.weekTotal;
+                document.getElementById('month-total').textContent = this.state.dailyRecords.monthTotal;
+            }
+
+            updateMantras() {
+                const mantraList = document.getElementById('mantra-list');
+                mantraList.innerHTML = '';
+
+                this.state.mantras.forEach(mantra => {
+                    const mantraItem = document.createElement('div');
+                    mantraItem.className = `mantra-item ${mantra.isActive ? 'active' : ''}`;
+                    mantraItem.dataset.id = mantra.id;
+                    
+                    mantraItem.innerHTML = `
+                        <div class="mantra-info">
+                            <div class="mantra-icon ${mantra.isActive ? 'orange' : ''}">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <p>${mantra.name}</p>
+                                <small>${mantra.batchSize} per batch</small>
+                            </div>
+                        </div>
+                        <div class="mantra-count">
+                            <span>${mantra.totalBatches}</span>
+                            <small>total</small>
+                        </div>
+                        <button class="delete-mantra-btn" onclick="event.stopPropagation(); window.counterApp.deleteMantra(${mantra.id})" title="Delete mantra">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="3,6 5,6 21,6"/>
+                                <path d="m19,6v14a2,2 0 0,1-2,2H7a2,2 0 0,1-2-2V6m3,0V4a2,2 0 0,1,2-2h4a2,2 0 0,1,2,2v2"/>
+                                <line x1="10" y1="11" x2="10" y2="17"/>
+                                <line x1="14" y1="11" x2="14" y2="17"/>
+                            </svg>
+                        </button>
+                    `;
+                    
+                    mantraItem.addEventListener('click', () => this.selectMantra(mantra.id));
+                    mantraList.appendChild(mantraItem);
+                });
+            }
+
+            // Mantra Management
+            selectMantra(id) {
+                this.state.mantras.forEach(mantra => {
+                    mantra.isActive = mantra.id === id;
+                });
+                
+                const activeMantra = this.state.mantras.find(m => m.isActive);
+                if (activeMantra) {
+                    this.state.batchSize = activeMantra.batchSize;
+                }
+                
+                this.updateDisplay();
+                this.saveToStorage();
+            }
+
+            showAddMantraModal() {
+                document.getElementById('add-mantra-modal').classList.add('show');
+                document.getElementById('mantra-name').focus();
+            }
+
+            hideAddMantraModal() {
+                document.getElementById('add-mantra-modal').classList.remove('show');
+                document.getElementById('mantra-name').value = '';
+                document.getElementById('mantra-batch-size').value = '108';
+            }
+
+            addMantra() {
+                const name = document.getElementById('mantra-name').value.trim();
+                const batchSize = parseInt(document.getElementById('mantra-batch-size').value) || 108;
+                
+                if (name) {
+                    const newId = Math.max(...this.state.mantras.map(m => m.id)) + 1;
+                    this.state.mantras.push({
+                        id: newId,
+                        name: name,
+                        batchSize: Math.max(1, Math.min(999, batchSize)),
+                        totalBatches: 0,
+                        isActive: false
+                    });
+                    
+                    this.updateDisplay();
+                    this.saveToStorage();
+                    this.hideAddMantraModal();
+                }
+            }
+
+            deleteMantra(id) {
+                const mantraToDelete = this.state.mantras.find(m => m.id === id);
+                if (!mantraToDelete) return;
+                
+                if (confirm(`Are you sure you want to delete "${mantraToDelete.name}"?`)) {
+                    this.state.mantras = this.state.mantras.filter(m => m.id !== id);
+                    
+                    // If we deleted the active mantra, make the first one active
+                    if (!this.state.mantras.find(m => m.isActive) && this.state.mantras.length > 0) {
+                        this.state.mantras[0].isActive = true;
+                        this.state.batchSize = this.state.mantras[0].batchSize;
+                    }
+                    
+                    this.updateDisplay();
+                    this.saveToStorage();
+                }
+            }
+
+            showSaveToMantraModal() {
+                document.getElementById('save-to-mantra-modal').classList.add('show');
+                document.getElementById('save-mantra-name').focus();
+                
+                // Pre-fill with current active mantra name if available
+                const activeMantra = this.state.mantras.find(m => m.isActive);
+                if (activeMantra) {
+                    document.getElementById('save-mantra-name').value = activeMantra.name;
+                }
+                
+                document.getElementById('save-mantra-batch-size').value = this.state.batchSize;
+            }
+
+            hideSaveToMantraModal() {
+                document.getElementById('save-to-mantra-modal').classList.remove('show');
+                document.getElementById('save-mantra-name').value = '';
+                document.getElementById('save-mantra-batch-size').value = this.state.batchSize;
+            }
+
+            saveToMantra() {
+                const name = document.getElementById('save-mantra-name').value.trim();
+                const batchSize = parseInt(document.getElementById('save-mantra-batch-size').value) || this.state.batchSize;
+                
+                if (name) {
+                    // Check if mantra already exists
+                    const existingMantra = this.state.mantras.find(m => m.name.toLowerCase() === name.toLowerCase());
+                    
+                    if (existingMantra) {
+                        // Update existing mantra
+                        existingMantra.totalBatches += this.state.completedBatches;
+                        existingMantra.batchSize = Math.max(1, Math.min(999, batchSize));
+                    } else {
+                        // Create new mantra
+                        const newId = Math.max(...this.state.mantras.map(m => m.id)) + 1;
+                        this.state.mantras.push({
+                            id: newId,
+                            name: name,
+                            batchSize: Math.max(1, Math.min(999, batchSize)),
+                            totalBatches: this.state.completedBatches,
+                            isActive: false
+                        });
+                    }
+                    
+                    this.hideSaveToMantraModal();
+                    
+                    // Now reset the batches after saving
+                    this.state.completedBatches = 0;
+                    this.state.dailyRecords.today = 0;
+                    
+                    this.updateDisplay();
+                    this.saveToStorage();
+                }
+            }
+
+            // Daily Records
+            updateDailyRecord() {
+                this.state.dailyRecords.today = this.state.completedBatches;
+                this.state.dailyRecords.weekTotal += 1;
+                this.state.dailyRecords.monthTotal += 1;
+                
+                // Update active mantra total
+                const activeMantra = this.state.mantras.find(m => m.isActive);
+                if (activeMantra) {
+                    activeMantra.totalBatches++;
+                }
+                
+                this.saveToStorage();
+            }
+
+            // Screen-off Counting
+            setupScreenOffCounting() {
+                // Remove existing listeners
+                document.removeEventListener('visibilitychange', this.handleVisibilityChange);
+                document.removeEventListener('click', this.handleScreenOffClick, true);
+                document.removeEventListener('touchstart', this.handleScreenOffTouch, true);
+
+                if (this.state.settings.screenOffCounting) {
+                    this.handleVisibilityChange = () => {
+                        this.state.screenOffCounting = document.hidden;
+                    };
+
+                    this.handleScreenOffClick = (event) => {
+                        if (this.state.screenOffCounting) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                            this.incrementCounter();
+                        }
+                    };
+
+                    this.handleScreenOffTouch = (event) => {
+                        if (this.state.screenOffCounting) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                            this.incrementCounter();
+                        }
+                    };
+
+                    document.addEventListener('visibilitychange', this.handleVisibilityChange);
+                    document.addEventListener('click', this.handleScreenOffClick, true);
+                    document.addEventListener('touchstart', this.handleScreenOffTouch, true);
+                }
+            }
+
+            // Sound Effects
+            playBatchCompleteSound() {
+                if (!this.state.settings.soundEnabled) return;
+                
+                if (this.state.customSound) {
+                    // Play custom uploaded sound
+                    const audio = new Audio(this.state.customSound);
+                    audio.volume = 0.7;
+                    audio.play().catch(e => console.log('Could not play custom sound'));
+                    return;
+                }
+                
+                // Built-in sound options
+                try {
+                    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    switch (this.state.settings.soundType) {
+                        case 'beep':
+                            oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+                            oscillator.frequency.exponentialRampToValueAtTime(400, audioContext.currentTime + 0.1);
+                            gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+                            oscillator.start(audioContext.currentTime);
+                            oscillator.stop(audioContext.currentTime + 0.1);
+                            break;
+                            
+                        case 'chime':
+                            // Create a gentle chime sound
+                            for (let i = 0; i < 3; i++) {
+                                const osc = audioContext.createOscillator();
+                                const gain = audioContext.createGain();
+                                osc.connect(gain);
+                                gain.connect(audioContext.destination);
+                                
+                                const freq = [523, 659, 784][i]; // C, E, G notes
+                                osc.frequency.setValueAtTime(freq, audioContext.currentTime + i * 0.2);
+                                gain.gain.setValueAtTime(0.05, audioContext.currentTime + i * 0.2);
+                                gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + i * 0.2 + 0.3);
+                                
+                                osc.start(audioContext.currentTime + i * 0.2);
+                                osc.stop(audioContext.currentTime + i * 0.2 + 0.3);
+                            }
+                            break;
+                            
+                        case 'bell':
+                            // Create a bell-like sound
+                            oscillator.frequency.setValueAtTime(1047, audioContext.currentTime); // High C
+                            oscillator.frequency.exponentialRampToValueAtTime(523, audioContext.currentTime + 0.5);
+                            gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+                            gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.8);
+                            oscillator.start(audioContext.currentTime);
+                            oscillator.stop(audioContext.currentTime + 0.8);
+                            break;
+                            
+                        case 'zen':
+                            // Create a zen bowl sound
+                            oscillator.frequency.setValueAtTime(256, audioContext.currentTime); // Low C
+                            gainNode.gain.setValueAtTime(0.15, audioContext.currentTime);
+                            gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 2);
+                            oscillator.start(audioContext.currentTime);
+                            oscillator.stop(audioContext.currentTime + 2);
+                            break;
+                            
+                        default:
+                            // Default beep
+                            oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+                            oscillator.frequency.exponentialRampToValueAtTime(400, audioContext.currentTime + 0.1);
+                            gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+                            oscillator.start(audioContext.currentTime);
+                            oscillator.stop(audioContext.currentTime + 0.1);
+                    }
+                } catch (e) {
+                    console.log('Batch completed!');
+                }
+            }
+
+            uploadCustomSound() {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = 'audio/*';
+                input.style.display = 'none';
+                
+                input.addEventListener('change', (e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            this.state.customSound = e.target.result;
+                            this.state.settings.soundType = 'custom';
+                            this.saveToStorage();
+                            this.updateSoundSettings();
+                            
+                            // Show success message
+                            const btn = document.getElementById('upload-sound-btn');
+                            const originalText = btn.textContent;
+                            btn.textContent = 'Sound Uploaded!';
+                            btn.style.background = 'linear-gradient(135deg, var(--primary-green), #059669)';
+                            setTimeout(() => {
+                                btn.textContent = originalText;
+                                btn.style.background = '';
+                            }, 2000);
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+                
+                document.body.appendChild(input);
+                input.click();
+                document.body.removeChild(input);
+            }
+
+            updateSoundSettings() {
+                const soundToggle = document.getElementById('sound-toggle');
+                const soundSelect = document.getElementById('sound-type-select');
+                
+                if (soundToggle) soundToggle.checked = this.state.settings.soundEnabled;
+                if (soundSelect) soundSelect.value = this.state.settings.soundType;
+                
+                // Update custom sound option
+                const customOption = soundSelect?.querySelector('option[value="custom"]');
+                if (customOption) {
+                    customOption.style.display = this.state.customSound ? 'block' : 'none';
+                    if (!this.state.customSound && this.state.settings.soundType === 'custom') {
+                        this.state.settings.soundType = 'beep';
+                        soundSelect.value = 'beep';
+                    }
+                }
+            }
+
+            // Auto-save
+            startAutoSave() {
+                setInterval(() => {
+                    if (this.state.settings.autoSave) {
+                        this.saveToStorage();
+                    }
+                }, 5000);
+            }
+        }
+
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            window.counterApp = new CounterApp();
+        });
+    </script>
+</body>
+</html>
